@@ -1,4 +1,6 @@
-# Git Character Counter #
+# Simple Git Character Counter
+
+**This is a forked project from <https://github.com/jmatsuzaki/git-character-counter> by jmatsuzaki.**
 
 Git Character Counter. Calculates the number of characters or words added based on the results of Git Diff.
 
@@ -6,50 +8,52 @@ Since Git Diff usually only counts additional lines, you can use this script to 
 
 By measuring the number of characters added since a specific date or commit, you can use it to measure your daily writing and programming productivity.
 
-1. [Screenshots](#screenshots)
-2. [Features](#features)
-3. [Requirements](#requirements)
-4. [Installation](#installation)
-5. [Usage](#usage)
-7. [Future works (TODO)](#future-works-todo)
-8. [Author](#author)
-9. [Preview images](#preview-images)
+- [Simple Git Character Counter](#simple-git-character-counter)
+  - [Features](#features)
+  - [Requirements](#requirements)
+  - [Installation](#installation)
+  - [Usage](#usage)
+    - [Comparison with working directory](#comparison-with-working-directory)
+    - [Specifing range of comparison](#specifing-range-of-comparison)
+    - [Other options](#other-options)
+  - [Future works (TODO)](#future-works-todo)
+  - [Difference between original and forked version](#difference-between-original-and-forked-version)
+  - [Authors](#authors)
+    - [Original Author](#original-author)
 
-## Screenshots ##
-
-![Screenshots](img/readme_screenshots.png)
-
-## Features ##
+## Features
 
 - The only environment required is bash and git
 - Use the git diff command to count the number of characters added to the file (Binary files are excluded)
-- Try to exclude blank lines, line feeds, and Front Matter
+- Try to exclude blank lines, line feeds
 - Support for specifying n previous commits, commit hash values, and dates (date expression or ISO date)
 - Support for specifying the start and end points for measurement
 - Supports word count instead of character count
 
-## Requirements ##
+## Requirements
 
 The only environment required is bash and git.
 
 The development environment is as follows:
 
-- GNU bash, version 5.1.16(1)-release (aarch64-apple-darwin21.1.0)
-- git version 2.35.1
+- GNU bash, version 5.0.17(1)-release
+- git version 2.25.1
 
-## Installation ##
+## Installation
 
 Download or clone this repository.
 
 It only needs git-character-counter.sh to work.
 
-## Usage ##
+## Usage
 
 Just run "git-character-counter.sh" in a shell.
 
 ```bash
 bash /foo/bar/git-character-counter.sh
 ```
+
+Or add this path to `PATH` environment variable.
 
 By default, it calculates the number of characters from the difference between the staged file and HEAD.
 
@@ -62,21 +66,24 @@ So, run this shell script after staging the file for which you want to calculate
 ```bash
 $ git add .
 $ bash /foo/bar/git-character-counter.sh
-
-=================================================
-Welcome to git character counter
-=================================================
-
-Target commits are as follows:
-From:@..To:--cached
-
-The target files are as follows:
-M	README.md
-M	git-character-counter.sh
-
-The number of Characters added is as follows:
-Total:     1896
+1896
 ```
+
+### Comparison with working directory
+
+You can compare HEAD with working directory by:
+
+```bash
+$ git-character-counter.sh -u
+```
+
+You can also compare HEAD with staged file by force (same as the default):
+
+```bash
+$ git-character-counter.sh -s
+```
+
+### Specifing range of comparison
 
 The -f (from) and -t (to) options can be used to specify the start and end points of the comparison.
 
@@ -135,62 +142,35 @@ git-character-counter.sh -f "2022-02-06 0:00" -t "2022-02-06 23:59"
 
 However, since date is an ambiguous concept in Git, we recommend specifying hash to get reliable results.
 
+### Other options
+
 -w option can be used to calculate the number of words instead of the number of characters. Note, however, that languages such as Japanese will not calculate the word count correctly.
 
 ```bash
 git-character-counter.sh -w
 ```
 
-For example, if you put the following in the pre-commit hook of Git Hooks(.git/hooks/pre-commit), you can run this program only on the files that have changed.
+## Future works (TODO)
 
-```bash:.git/hooks/pre-commit
-bash /foo/bar/git-character-counter.sh
-```
+See <https://github.com/jmatsuzaki/git-character-counter>
 
-In this example, when you commit, you will see a message like the following:
+Note that this is a forked project that has no future work.
 
-```bash
-=================================================
-Welcome to git character counter
-=================================================
+## Difference between original and forked version
 
-Target commits are as follows:
-From:@..To:--cached
+This forked version:
 
-The target files are as follows:
-M	20210108145021.md
+- doesn't show friendly output; shows only word count instead
+- doesn't remove frontmatter
+- can specify `-u` and `-s` options to the target: working tree or staged files
 
-The number of Characters added is as follows:
-Total:       39
+## Authors
 
-[master fbaa44f] Git Character Counter test
- 1 file changed, 3 insertions(+), 1 deletion(-)
-Enumerating objects: 5, done.
-Counting objects: 100% (5/5), done.
-Delta compression using up to 10 threads
-Compressing objects: 100% (3/3), done.
-Writing objects: 100% (3/3), 408 bytes | 408.00 KiB/s, done.
-Total 3 (delta 2), reused 0 (delta 0), pack-reused 0
-remote: Resolving deltas: 100% (2/2), completed with 2 local objects.
-To github.com:jmatsuzaki/Zettelkasten.git
-   16cae33..fbaa44f  master -> master
-```
+Yuki Fujiwara (@sky-y)
 
-## Future works (TODO) ##
-
-- Improvement of front matter support
-- Output the details for each file
-- Number of characters and words in the whole document
-- Ignore tags in markdown notation
-
-## Author ##
+### Original Author
 
 - [jMatsuzaki](https://jmatsuzaki.com/)
 - [jMatsuzaki Inc.](https://jmatsuzaki.com/company)
 - [@jmatsuzaki](https://twitter.com/jmatsuzaki)
 
-## Preview images ##
-
-Preview images were taken using:
-
-- [iTerm2](https://iterm2.com/) terminal emulator on macOS
