@@ -1,17 +1,10 @@
-#!/bin/bash
-
-echo ""
-echo "================================================="
-echo "Welcome to git character counter"
-echo "================================================="
-echo ""
+#!/bin/bash -eu
 
 ### Definition
-fm="^(---|uid|title|aliases|date|update|tags|draft)" # Ignore Front Matter
-wcOpt="-m" # wc option
-countUnit="Characters"
-from="@" # HEAD
-to="--cached" # Staging files
+wcOpt="-m"           # wc option: charactor base
+cachedOpt="--cached" # compare staged files
+from="HEAD"
+to=""
 
 ### Create help (-h | --help)
 function usage {
@@ -25,17 +18,19 @@ Usage:
 Options:
   -f  [n|char|date]   Startpoint for comparison. n times before or hash (40|7 digit) or by date (date expression or ISO date). Default is HEAD.
   -t  [n|char|date]   Endpoint point for comparison. The format is the same as -f. Default is Staging.
+  -s                  Compare -f startpoint with staged files. [Default]
+  -u                  Compare -f startpoint with the working tree (unstaged files).
   -w                  Count words instead of characters
   -h                  Display this help
 
-Documentation can be found at https://github.com/jmatsuzaki/git-character-counter
+Documentation can be found at https://github.com/sky-y/simple-git-character-counter
 EOM
 
   exit 1
 }
 
 ### Process definition by argument
-while getopts ":f:t:wh" optKey; do
+while getopts ":f:t:wsuh" optKey; do
   case "$optKey" in
     f)
       # hash checking
@@ -63,7 +58,14 @@ while getopts ":f:t:wh" optKey; do
       ;;
     w)
       wcOpt="-w"
-      countUnit="Words"
+      ;;
+    s)
+      # staged
+      cachedOpt="--cached"
+      ;;
+    u)
+      # unstaged (on working tree)
+      cachedOpt=""
       ;;
     h)
       usage
@@ -77,25 +79,5 @@ while getopts ":f:t:wh" optKey; do
   esac
 done
 
-### Function of target files list
-get-character-count-target () {
-  git diff -p --name-status --diff-filter=AM "$from" "$to"
-}
-
-### Function of count characters
-character-count () {
-  git diff -p -b -w -U0 --diff-filter=AM --ignore-cr-at-eol --ignore-space-at-eol --ignore-blank-lines --ignore-matching-lines=$fm "$from" "$to" | grep ^+ | grep -v ^+++ | sed s/^+// | sed -e ':a' -e 'N' -e '$!ba' -e 's/\n//g' | wc $wcOpt
-}
-
 ### Main
-echo "Target commits are as follows:"
-echo "From:$from..To:$to"
-echo ""
-echo "The target files are as follows:"
-countTarget=`get-character-count-target`
-echo "$countTarget"
-echo ""
-echo "The number of $countUnit added is as follows:"
-characterCount=`character-count`
-echo "Total: $characterCount"
-echo ""
+git diff -p -b -w -U0 --diff-filter=AM --ignore-cr-at-eol --ignore-space-at-eol --ignore-blank-lines $cachedOpt "$from" $to | grep ^+ | grep -v ^+++ | sed s/^+// | sed -e ':a' -e 'N' -e '$!ba' -e 's/\n//g' | wc $wcOpt
